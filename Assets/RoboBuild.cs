@@ -21,7 +21,7 @@ public class RoboBuild : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	   
 	}
  
     public void setBPpath(string path)
@@ -40,6 +40,7 @@ public class RoboBuild : MonoBehaviour {
         Matrix4x4[] pMatrix = new Matrix4x4[data.Length];
         GameObject part;
         parts = new List<GameObject>();
+        ObjImporter obj = new ObjImporter();
         //create objects
         for (int i = 0; i < data.Length; i++)
         {
@@ -53,20 +54,22 @@ public class RoboBuild : MonoBehaviour {
             }
 
             part = new GameObject(data[i].Name);
+            Debug.Log(data[i].Name);
             parts.Add(part);
-            try
+           try
             {
                 if (File.Exists(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj"))
                 {
+                   // Debug.Log("Exists");
+                    
                     Material m = new Material(Shader.Find("Standard"));
                     part.AddComponent<MeshRenderer>().material = m;
-                    part.AddComponent<MeshFilter>().mesh = FastObjImporter.Instance.ImportFile(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj");
+                    part.AddComponent<MeshFilter>().mesh = obj.ImportFile(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj");
                 }
             }
-            catch { };
+           catch { };
 
             part.transform.position = Utils.GetPosition(pMatrix[i]);
-            part.transform.position = new Vector3(part.transform.position.x * -1f, part.transform.position.y , part.transform.position.z );
             part.transform.rotation = Utils.GetRotation(pMatrix[i]);
             part.transform.localScale = Utils.GetScale(pMatrix[i]);
 
@@ -108,7 +111,7 @@ public class RoboBuild : MonoBehaviour {
         xw.WriteAttributeString("Value", (-1).ToString());
         xw.WriteEndElement();
         xw.WriteStartElement("TransMat");
-        BD.SMatrix = Matrix4x4.TRS(new Vector3(Base.transform.position.x * -1, Base.transform.position.y, Base.transform.position.z),Base.transform.rotation,Base.transform.localScale);
+        BD.SMatrix = Matrix4x4.TRS(Base.transform.position,Base.transform.rotation,Base.transform.localScale);
         xw.WriteString(MatrixToString(BD.SMatrix.transpose));
         xw.WriteEndElement();
         xw.WriteStartElement("OffsetMat");
@@ -134,31 +137,31 @@ public class RoboBuild : MonoBehaviour {
         xw.WriteAttributeString("Value", BD.Windom_Hide.ToString());
         xw.WriteEndElement();
         xw.WriteEndElement();
-
+        CurrentID++;
         setChildren(Base.transform, 1, CurrentID);
         xw.WriteEndDocument();
         xw.Close();
     }
 
-    public void setChildren(Transform childs,int level,int parent)
+    public void setChildren(Transform Tparent,int level,int parent)
     {
         GameObject Base;
         BoneData BD;
-        foreach (Transform child in childs)
+        for(int i = 0; i < Tparent.childCount; i++)
         {
-            CurrentID++;
-            Base = child.gameObject;
+            
+            Base = Tparent.GetChild(i).gameObject;
             BD = Base.GetComponent<BoneData>();
             xw.WriteStartElement(Base.name);
             xw.WriteStartElement("Level");
             xw.WriteAttributeString("Value", level.ToString());
             xw.WriteEndElement();
             xw.WriteStartElement("ParentBoneIdx");
-            xw.WriteAttributeString("Value", CurrentID.ToString());
+            xw.WriteAttributeString("Value", parent.ToString());
             xw.WriteEndElement();
             xw.WriteStartElement("TransMat");
-            BD.SMatrix = Matrix4x4.TRS(new Vector3(Base.transform.position.x * -1, Base.transform.position.y, Base.transform.position.z), Base.transform.rotation, Base.transform.localScale);  
-            xw.WriteString(MatrixToString((BD.SMatrix * child.parent.gameObject.GetComponent<BoneData>().SMatrix.inverse).transpose));
+            BD.SMatrix = Matrix4x4.TRS(Base.transform.position, Base.transform.rotation, Base.transform.localScale);
+            xw.WriteString(MatrixToString((Tparent.gameObject.GetComponent<BoneData>().SMatrix.inverse * BD.SMatrix).transpose));
             xw.WriteEndElement();
             xw.WriteStartElement("OffsetMat");
             xw.WriteString(MatrixToString(BD.SMatrix.transpose.inverse));
@@ -183,7 +186,7 @@ public class RoboBuild : MonoBehaviour {
             xw.WriteAttributeString("Value", BD.Windom_Hide.ToString());
             xw.WriteEndElement();
             xw.WriteEndElement();
-
+            CurrentID++;
             if (Base.transform.childCount != 0)
                 setChildren(Base.transform, level + 1, CurrentID);
         }

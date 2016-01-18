@@ -21,7 +21,7 @@ public class PartEditor : MonoBehaviour {
 	Rect windowRect = new Rect(40, 80, 380,260);
 	int ToolSelect;
 	string[] ToolsName = {"Main","Transform","Pieces","Attach"};
-	GameObject Piece;
+	public GameObject Piece;
 	string TextureUrl = "";
 	public string folder;
     string apName = "";
@@ -35,7 +35,11 @@ public class PartEditor : MonoBehaviour {
 
 
     }
-	
+	void Update()
+    {
+        
+    }
+
 	void OnGUI()
 	{
 		windowRect = GUI.Window(ID,windowRect,WindowFunction,"Editor");
@@ -224,7 +228,7 @@ public class PartEditor : MonoBehaviour {
 		}catch{}
 	}
 	
-	private void UpdateTransformValues(){
+	public void UpdateTransformValues(){
 		try {
 			PositionText = new VectorString(Piece.transform.localPosition);
 			RotationText = new VectorString(Piece.transform.localEulerAngles);
