@@ -17,7 +17,9 @@ public static class AnimeLoader{
         {
             int keyvalue = 0;
             BoneCurves BC = new BoneCurves();
-            BC.name = Bone.LocalName;
+            BC.name = Bone.Attributes["Text"].Value;
+            //Debug.Log(Bone.Name);
+     
             XmlNodeList childs = Bone.ChildNodes;
             for(int i = 0; i < childs.Count; i++)
             {
