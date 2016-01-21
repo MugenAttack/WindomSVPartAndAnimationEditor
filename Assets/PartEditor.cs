@@ -6,6 +6,7 @@ using System;
 
 public class PartEditor : MonoBehaviour {
     RoboBuild RB;
+    AnimeEditor AE;
 	public int ID;
 	string Name = "";
 	string NewPiece = "";
@@ -28,10 +29,11 @@ public class PartEditor : MonoBehaviour {
     string apFile = "";
     GameObject[] Childlist;
     bool isChildList = false;
+    bool Hide = false;
 	//rewrite GUI simplify things into 2 menus or less
 	void Start(){
         RB = GetComponent<RoboBuild>();
-        
+        AE = GetComponent<AnimeEditor>();
 
 
     }
@@ -42,8 +44,11 @@ public class PartEditor : MonoBehaviour {
 
 	void OnGUI()
 	{
-		windowRect = GUI.Window(ID,windowRect,WindowFunction,"Editor");
-		CheckPieceChange();
+        if (!Hide)
+        {
+            windowRect = GUI.Window(ID, windowRect, WindowFunction, "Part Editor");
+            CheckPieceChange();
+        }
 	}
 	
 	void WindowFunction(int windowID){
@@ -61,6 +66,7 @@ public class PartEditor : MonoBehaviour {
 		}
 		
 		GUI.DragWindow();
+        
 	}
 	
 	#region GUI Controls	
@@ -69,10 +75,11 @@ public class PartEditor : MonoBehaviour {
 		//pieces handling aka models
 		GUI.BeginGroup(new Rect(x,y,360,230));
 		GUI.Box(new Rect(0,0,360,230),"Piece Selection and Control");
+        GUI.Box(new Rect(10, 22, 250, 51), "");
         GUI.Label(new Rect(20, 25, 90, 20), "Name:");
-        RB.parts[selectedPiece].name = GUI.TextField(new Rect(90, 25, 170, 20), RB.parts[selectedPiece].name);
+        GUI.Label(new Rect(90, 25, 170, 20), RB.parts[selectedPiece].name);
         GUI.Label(new Rect(20, 50, 90, 20), "File Name:");
-        RB.parts[selectedPiece].GetComponent<BoneData>().Windom_FileName = GUI.TextField(new Rect(90,50,170,20), RB.parts[selectedPiece].GetComponent<BoneData>().Windom_FileName);
+        GUI.Label(new Rect(90,50,170,20), RB.parts[selectedPiece].GetComponent<BoneData>().Windom_FileName);
         if (GUI.Button(new Rect(262,25,88,20),"Add Part")){ LockGUI = 2; }
 		if (GUI.Button(new Rect(262,50,88,20), "Transform")){LockGUI = 1;UpdateTransformValues();}
 		//if (GUI.Button(new Rect(262,69,88,20), "Texture")){LockGUI = 2;}
@@ -108,8 +115,8 @@ public class PartEditor : MonoBehaviour {
         GUI.Label(new Rect(20, 80, 110, 20), "Model Folder Path");
         RB.Modelpath = GUI.TextField(new Rect(20, 100, 320, 20), RB.Modelpath);
 
-        if (GUI.Button(new Rect(135, 160, 88, 20), "Load")) {RB.LoadRobo(); LockGUI = 0; UpdateTransformValues(); }
-
+        if (GUI.Button(new Rect(10, 145, 165, 20), "Load to Skeleton Editor")) {RB.LoadRobo(); LockGUI = 0; UpdateTransformValues(); }
+        if (GUI.Button(new Rect(185, 145, 165, 20), "Load to Animation Editor")) {RB.LoadRobo(); Hide = true; AE.Hide = false; }
         GUI.EndGroup();
     }
 
@@ -127,16 +134,16 @@ public class PartEditor : MonoBehaviour {
         if (GUI.Button(new Rect(10, 170, 165, 20), "Load Part")) {
             GameObject newPart = new GameObject(apName);
             RB.parts.Add(newPart);
-            try
-            {
+           try
+           {
                 if (File.Exists(RB.Modelpath + "\\" + apFile.Substring(0, apFile.Length - 2) + ".obj"))
                 {
                     Material m = new Material(Shader.Find("Standard"));
                     newPart.AddComponent<MeshRenderer>().material = m;
-                    newPart.AddComponent<MeshFilter>().mesh = FastObjImporter.Instance.ImportFile(RB.Modelpath + "\\" + apFile.Substring(0, apFile.Length - 2) + ".obj");
+                    newPart.AddComponent<MeshFilter>().mesh = RB.obj.ImportFile(RB.Modelpath + "\\" + apFile.Substring(0, apFile.Length - 2) + ".obj");
                 }
-            }
-            catch { };
+           }
+          catch { };
 
             newPart.AddComponent<BoneData>().setDefault();
             newPart.GetComponent<BoneData>().Windom_FileName = apFile;
@@ -230,16 +237,16 @@ public class PartEditor : MonoBehaviour {
 	
 	public void UpdateTransformValues(){
 		try {
-			PositionText = new VectorString(Piece.transform.localPosition);
-			RotationText = new VectorString(Piece.transform.localEulerAngles);
+			PositionText = new VectorString(Piece.transform.position);
+			RotationText = new VectorString(Piece.transform.eulerAngles);
 			ScaleText = new VectorString(Piece.transform.localScale);
 		}catch{}
 	}
 	
 	private void ApplyTransformValues(){
 		try{
-			Piece.transform.localPosition = PositionText.getVector3();
-			Piece.transform.localEulerAngles = RotationText.getVector3();
+			Piece.transform.position = PositionText.getVector3();
+			Piece.transform.eulerAngles = RotationText.getVector3();
 			Piece.transform.localScale = ScaleText.getVector3();
 		}catch{}
 	}
@@ -261,7 +268,10 @@ public class PartEditor : MonoBehaviour {
         {
             GameObject.Destroy(RB.parts[selectedPiece]);
             RB.parts.RemoveAt(selectedPiece);
+            selectedPiece = 0;
         }
+
+       
 	}	
 	
 	private void CreateObject(){

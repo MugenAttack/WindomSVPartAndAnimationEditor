@@ -62,6 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AnimeEditor.cs" />
+    <Compile Include="Assets\AnimeLoader.cs" />
+    <Compile Include="Assets\BoneCurves.cs" />
     <Compile Include="Assets\BoneData.cs" />
     <Compile Include="Assets\BoneProperty.cs" />
     <Compile Include="Assets\CameraControl.cs" />

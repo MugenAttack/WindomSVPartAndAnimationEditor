@@ -21,7 +21,7 @@ public class CameraControl : MonoBehaviour {
 
         transform.LookAt(lookAtpos);
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && PE.Piece != null)
         {
             Vector2 mDelta = Input.mouseScrollDelta;
             PE.Piece.transform.position = PE.Piece.transform.position + (cross * mDelta.x) + (Vector3.up * mDelta.y);

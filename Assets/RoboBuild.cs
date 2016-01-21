@@ -11,6 +11,8 @@ public class RoboBuild : MonoBehaviour {
     public string Modelpath = "";
     public bool parent = true;
     XmlWriter xw;
+    public ObjImporter obj = new ObjImporter();
+    public List<BoneCurves> BC;
     //public List<GameObject> OrderedParts;
     int CurrentID = -1;
     
@@ -40,7 +42,7 @@ public class RoboBuild : MonoBehaviour {
         Matrix4x4[] pMatrix = new Matrix4x4[data.Length];
         GameObject part;
         parts = new List<GameObject>();
-        ObjImporter obj = new ObjImporter();
+        
         //create objects
         for (int i = 0; i < data.Length; i++)
         {
@@ -60,7 +62,7 @@ public class RoboBuild : MonoBehaviour {
             {
                 if (File.Exists(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj"))
                 {
-                   // Debug.Log("Exists");
+                   Debug.Log("Exists");
                     
                     Material m = new Material(Shader.Find("Standard"));
                     part.AddComponent<MeshRenderer>().material = m;
@@ -227,5 +229,28 @@ public class RoboBuild : MonoBehaviour {
             Merge += LA[i].ToString() + " ";
         }
         return Merge;
+    }
+
+    public void LoadRoboAnime(string AnimeID)
+    {
+        BC = AnimeLoader.Load(BPpath + "\\Anime_" + AnimeID.ToString() + ".xml");
+         
+        for (int i = 0; i < BC.Count; i++)
+        {
+            foreach (GameObject part in parts)
+            {
+                if (part.name == BC[i].name)
+                { BC[i].GO = part; Debug.Log(part.name); }
+            }
+        }
+
+    }
+
+    public void AnimeFrameGo(int Frame)
+    {
+        for (int i = 0; i < BC.Count; i++)
+        {
+            BC[i].CalculateFrame(Frame);
+        }
     }
 }
