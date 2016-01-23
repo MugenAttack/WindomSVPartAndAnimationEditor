@@ -34,7 +34,7 @@ public class PartEditor : MonoBehaviour {
 	void Start(){
         RB = GetComponent<RoboBuild>();
         AE = GetComponent<AnimeEditor>();
-
+        RB.LoadPaths();
 
     }
 	void Update()
@@ -115,8 +115,8 @@ public class PartEditor : MonoBehaviour {
         GUI.Label(new Rect(20, 80, 110, 20), "Model Folder Path");
         RB.Modelpath = GUI.TextField(new Rect(20, 100, 320, 20), RB.Modelpath);
 
-        if (GUI.Button(new Rect(10, 145, 165, 20), "Load to Skeleton Editor")) {RB.LoadRobo(); LockGUI = 0; UpdateTransformValues(); }
-        if (GUI.Button(new Rect(185, 145, 165, 20), "Load to Animation Editor")) {RB.LoadRobo(); Hide = true; AE.Hide = false; }
+        if (GUI.Button(new Rect(10, 145, 165, 20), "Load to Skeleton Editor")) { RB.SavePaths(); RB.LoadRobo(); LockGUI = 0; UpdateTransformValues(); }
+        if (GUI.Button(new Rect(185, 145, 165, 20), "Load to Animation Editor")) { RB.SavePaths(); RB.LoadRobo(); Hide = true; AE.Hide = false; }
         GUI.EndGroup();
     }
 

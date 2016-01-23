@@ -13,6 +13,7 @@ public class RoboBuild : MonoBehaviour {
     XmlWriter xw;
     public ObjImporter obj = new ObjImporter();
     public List<BoneCurves> BC;
+    string AnimeIDSave = "0";
     //public List<GameObject> OrderedParts;
     int CurrentID = -1;
     
@@ -233,7 +234,8 @@ public class RoboBuild : MonoBehaviour {
 
     public void LoadRoboAnime(string AnimeID)
     {
-        BC = AnimeLoader.Load(BPpath + "\\Anime_" + AnimeID.ToString() + ".xml");
+        AnimeIDSave = AnimeID;
+        BC = AnimeLoader.Load(BPpath + "\\Anime_" + AnimeID + ".xml");
          
         for (int i = 0; i < BC.Count; i++)
         {
@@ -246,11 +248,47 @@ public class RoboBuild : MonoBehaviour {
 
     }
 
+    public void SaveRoboAnime()
+    {
+        AnimeLoader.Save(BC, BPpath + "\\Anime_" + AnimeIDSave + ".xml");
+    }
+
     public void AnimeFrameGo(int Frame)
     {
         for (int i = 0; i < BC.Count; i++)
         {
             BC[i].CalculateFrame(Frame);
         }
+    }
+
+    public void SavePaths()
+    {
+        XmlWriterSettings xws = new XmlWriterSettings();
+        xws.Indent = true;
+        xw = XmlWriter.Create("Settings.xml", xws);
+        xw.WriteStartDocument();
+        xw.WriteStartElement("Settings");
+        xw.WriteStartElement("Xed");
+        xw.WriteAttributeString("Path", BPpath);
+        xw.WriteEndElement();
+        xw.WriteStartElement("Models");
+        xw.WriteAttributeString("Path", Modelpath);
+        xw.WriteEndElement();
+        xw.WriteEndElement();
+        xw.WriteEndDocument();
+        xw.Close();
+    }
+
+    public void LoadPaths()
+    {
+        if (File.Exists("Settings.xml"))
+        { 
+        XmlDocument Doc = new XmlDocument();
+        Doc.Load("Settings.xml");
+        XmlNode settings = Doc.SelectSingleNode("Settings");
+        BPpath = settings.ChildNodes[0].Attributes["Path"].Value;
+        Modelpath = settings.ChildNodes[1].Attributes["Path"].Value;
+        }
+        
     }
 }

@@ -8,13 +8,17 @@ public class AnimeEditor : MonoBehaviour {
     public string sFrameC = "";
     public string speed = "";
     VectorString PositionText = new VectorString(0, 0, 0);
-    VectorString RotationText = new VectorString(0, 0, 0);
-    VectorString ScaleText = new VectorString(0, 0, 0);
+    
     GameObject Piece;
     RoboBuild RB;
     string AnimeID = "";
     int guilock = 0;
     float prevValue;
+    int selection = 0;
+    int prevmode = 0;
+    int editmode = 0;
+    string[] slist = new string[] { "Parts", "Frames" };
+    string[] elist = new string[] { "Position", "Rotation", "Scale" };
     // Use this for initialization
     void Start () {
         RB = GetComponent<RoboBuild>();
@@ -79,38 +83,36 @@ public class AnimeEditor : MonoBehaviour {
         GUI.Box(new Rect(10, Screen.height / 2 - 200, 275, 400), "Animation Editor");
 
         //transform data
-        GUI.Label(new Rect(30, Screen.height / 2 - 180, 50, 20), "Position");
+        GUI.Label(new Rect(30, Screen.height / 2 - 180, 50, 20), elist[editmode]);
         GUI.Label(new Rect(30, Screen.height / 2 - 160, 20, 20), "  X");
         PositionText.x = GUI.TextField(new Rect(50, Screen.height / 2 - 160, 50, 20), PositionText.x);
         GUI.Label(new Rect(100, Screen.height / 2 - 160, 20, 20), "  Y");
         PositionText.y = GUI.TextField(new Rect(120, Screen.height / 2 - 160, 50, 20), PositionText.y);
         GUI.Label(new Rect(170, Screen.height / 2 - 160, 20, 20), "  Z");
         PositionText.z = GUI.TextField(new Rect(190, Screen.height / 2 - 160, 50, 20), PositionText.z);
+        editmode = GUI.SelectionGrid(new Rect(30, Screen.height / 2 - 130, 235, 20), editmode, elist, 3);
 
-        GUI.Label(new Rect(30, Screen.height / 2 - 140, 50, 20), "Rotation");
-        GUI.Label(new Rect(30, Screen.height / 2 - 120, 20, 20), "  X");
-        RotationText.x = GUI.TextField(new Rect(50, Screen.height / 2 - 120, 50, 20), RotationText.x);
-        GUI.Label(new Rect(100, Screen.height / 2 - 120, 20, 20), "  Y");
-        RotationText.y = GUI.TextField(new Rect(120, Screen.height / 2 - 120, 50, 20), RotationText.y);
-        GUI.Label(new Rect(170, Screen.height / 2 - 120, 20, 20), "  Z");
-        RotationText.z = GUI.TextField(new Rect(190, Screen.height / 2 - 120, 50, 20), RotationText.z);
-
-        GUI.Label(new Rect(30, Screen.height / 2 - 100, 50, 20), "Scale");
-        GUI.Label(new Rect(30, Screen.height / 2 - 80, 20, 20), "  X");
-        ScaleText.x = GUI.TextField(new Rect(50, Screen.height / 2 - 80, 50, 20), ScaleText.x);
-        GUI.Label(new Rect(100, Screen.height / 2 - 80, 20, 20), "  Y");
-        ScaleText.y = GUI.TextField(new Rect(120, Screen.height / 2 - 80, 50, 20), ScaleText.y);
-        GUI.Label(new Rect(170, Screen.height / 2 - 80, 20, 20), "  Z");
-        ScaleText.z = GUI.TextField(new Rect(190, Screen.height / 2 - 80, 50, 20), ScaleText.z);
+        if (selection == 1)
+        {
+            GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 235), "Frames");
+            if (GUI.Button(new Rect(30, Screen.height / 2 + 140, 116, 20), "Add")) { }
+            if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove")) { }
+        }
+        else
+        { 
+            GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 260), "Parts");
+        }
+        selection = GUI.SelectionGrid(new Rect(30, Screen.height / 2 + 165, 235, 20), selection, slist, 2);
     }
+
 
     public void UpdateTransformValues()
     {
         try
         {
-            PositionText = new VectorString(Piece.transform.position);
-            RotationText = new VectorString(Piece.transform.eulerAngles);
-            ScaleText = new VectorString(Piece.transform.localScale);
+           // PositionText = new VectorString(Piece.transform.position);
+            //RotationText = new VectorString(Piece.transform.eulerAngles);
+            //ScaleText = new VectorString(Piece.transform.localScale);
         }
         catch { }
     }
@@ -119,9 +121,9 @@ public class AnimeEditor : MonoBehaviour {
     {
         try
         {
-            Piece.transform.position = PositionText.getVector3();
-            Piece.transform.eulerAngles = RotationText.getVector3();
-            Piece.transform.localScale = ScaleText.getVector3();
+           // Piece.transform.position = PositionText.getVector3();
+           // Piece.transform.eulerAngles = RotationText.getVector3();
+           // Piece.transform.localScale = ScaleText.getVector3();
         }
         catch { }
     }

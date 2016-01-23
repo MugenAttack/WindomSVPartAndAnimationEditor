@@ -37,7 +37,7 @@ public class BoneCurves {
         RotCurve = new List<RotPoint>();
         ScaleCurve = new List<ScalePoint>();
     }
-
+    
     public void CalculateFrame(int Frame)
     {
         int LowerFrame = -1;
@@ -45,11 +45,11 @@ public class BoneCurves {
         //determine position
         if (PosCurve.Count > 1)
         {
-            for (int i = 0; i < PosCurve.Count;)
+            for (int i = 0; i < PosCurve.Count; i++)
             {
                 if (PosCurve[i].Frame == Frame)
                 {
-                    GO.transform.position = PosCurve[i].Value;
+                    GO.transform.localPosition = PosCurve[i].Value;
                     LowerFrame = -1;
                     HigherFrame = -1;
                     break;
@@ -72,18 +72,18 @@ public class BoneCurves {
 
         }
         else if (PosCurve.Count != 0)
-            GO.transform.position = PosCurve[0].Value;
+            GO.transform.localPosition = PosCurve[0].Value;
 
         LowerFrame = -1;
         HigherFrame = -1;
         //determine rotation
         if (RotCurve.Count > 1)
         {
-            for (int i = 0; i < RotCurve.Count;)
+            for (int i = 0; i < RotCurve.Count; i++)
             {
                 if (RotCurve[i].Frame == Frame)
                 {
-                    GO.transform.rotation = RotCurve[i].Value;
+                    GO.transform.localRotation = RotCurve[i].Value;
                     LowerFrame = -1;
                     HigherFrame = -1;
                     break;
@@ -106,14 +106,14 @@ public class BoneCurves {
 
         }
         else if (RotCurve.Count != 0)
-            GO.transform.rotation = RotCurve[0].Value;
+            GO.transform.localRotation = RotCurve[0].Value;
 
         LowerFrame = -1;
         HigherFrame = -1;
         //determine scale
         if (ScaleCurve.Count > 1)
         {
-            for (int i = 0; i < ScaleCurve.Count;)
+            for (int i = 0; i < ScaleCurve.Count; i++)
             {
                 if (ScaleCurve[i].Frame == Frame)
                 {
