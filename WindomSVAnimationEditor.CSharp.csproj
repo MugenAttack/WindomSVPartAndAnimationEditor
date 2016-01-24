@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>5.3.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,6 +50,7 @@
     <Reference Include="UnityScript.Lang" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="AssimpNet" />
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
@@ -68,12 +71,16 @@
     <Compile Include="Assets\BoneData.cs" />
     <Compile Include="Assets\BoneProperty.cs" />
     <Compile Include="Assets\CameraControl.cs" />
-    <Compile Include="Assets\FastObjImporter.cs" />
-    <Compile Include="Assets\ObjImporter.cs" />
     <Compile Include="Assets\PartEditor.cs" />
     <Compile Include="Assets\RoboBuild.cs" />
     <Compile Include="Assets\Utils.cs" />
     <Compile Include="Assets\VectorString.cs" />
+    <Compile Include="Assets\Extentions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Assimp\Plugins\Assimp32.dll" />
+    <Content Include="Assets\Assimp\Plugins\Assimp64.dll" />
+    <Content Include="Assets\Assimp\Plugins\AssimpNet.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

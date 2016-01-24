@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System;
+using Assets;
 
 public class PartEditor : MonoBehaviour {
     RoboBuild RB;
@@ -136,11 +138,14 @@ public class PartEditor : MonoBehaviour {
             RB.parts.Add(newPart);
            try
            {
-                if (File.Exists(RB.Modelpath + "\\" + apFile.Substring(0, apFile.Length - 2) + ".obj"))
+                if (File.Exists(RB.Modelpath + "\\" + apFile))
                 {
-                    Material m = new Material(Shader.Find("Standard"));
-                    newPart.AddComponent<MeshRenderer>().material = m;
-                    newPart.AddComponent<MeshFilter>().mesh = RB.obj.ImportFile(RB.Modelpath + "\\" + apFile.Substring(0, apFile.Length - 2) + ".obj");
+                    var scen = RB.Importer.ImportFile(RB.Modelpath + "\\" + apFile, Assimp.PostProcessSteps.MakeLeftHanded);
+                    Mesh mesh = new Mesh();
+                    mesh.CombineMeshes(scen.Meshes.Select(c => new CombineInstance() { mesh = c.ToUnityMesh(), transform = scen.RootNode.Transform.ToUnityMatrix() }).ToArray(), false);
+
+                    newPart.AddComponent<MeshFilter>().mesh = mesh;
+                    newPart.AddComponent<MeshRenderer>().materials = scen.Materials.Select(m => m.ToUnityMaterial()).ToArray();
                 }
            }
           catch { };
