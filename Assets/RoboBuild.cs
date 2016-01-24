@@ -42,7 +42,7 @@ public class RoboBuild : MonoBehaviour {
 
     public void LoadRobo()
     {
-        BpBoneData[] data = BoneProperty.Read(BPpath + "\\BoneProperty.xml");
+        BpBoneData[] data = BoneProperty.Read(Path.Combine(BPpath, "BoneProperty.xml"));
         Matrix4x4[] pMatrix = new Matrix4x4[data.Length];
         GameObject part;
         parts = new List<GameObject>();
@@ -124,7 +124,7 @@ public class RoboBuild : MonoBehaviour {
         GameObject Base = parts[0];
         XmlWriterSettings xws = new XmlWriterSettings();
         xws.Indent = true;
-        xw = XmlWriter.Create(BPpath + "\\BoneProperty.xml", xws);
+        xw = XmlWriter.Create(Path.Combine(BPpath, "BoneProperty.xml"), xws);
         xw.WriteStartDocument();
         xw.WriteStartElement("BoneProperty");
         xw.WriteAttributeString("Count",parts.Count.ToString());
@@ -260,7 +260,7 @@ public class RoboBuild : MonoBehaviour {
     public void LoadRoboAnime(string AnimeID)
     {
         AnimeIDSave = AnimeID;
-        BC = AnimeLoader.Load(BPpath + "\\Anime_" + AnimeID + ".xml");
+        BC = AnimeLoader.Load(Path.Combine(BPpath, "Anime_" + AnimeID + ".xml"));
          
         for (int i = 0; i < BC.Count; i++)
         {
@@ -276,7 +276,7 @@ public class RoboBuild : MonoBehaviour {
 
     public void SaveRoboAnime()
     {
-        AnimeLoader.Save(BC, BPpath + "\\Anime_" + AnimeIDSave + ".xml");
+        AnimeLoader.Save(BC, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"));
     }
 
     public void AnimeFrameGo(int Frame)
