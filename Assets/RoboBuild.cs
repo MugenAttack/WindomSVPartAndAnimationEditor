@@ -68,7 +68,7 @@ public class RoboBuild : MonoBehaviour
             {
                 if (File.Exists(Path.Combine(Modelpath, data[i].Windom_FileName)))
                 {
-                    Debug.Log("Exists");
+                    
 
                     var scen = Importer.ImportFile(Path.Combine(Modelpath, data[i].Windom_FileName), Helper.PostProcessStepflags);
                     Mesh mesh = new Mesh();
@@ -315,4 +315,6 @@ public class RoboBuild : MonoBehaviour
         }
 
     }
+
+    
 }

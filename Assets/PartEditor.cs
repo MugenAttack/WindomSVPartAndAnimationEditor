@@ -9,12 +9,11 @@ using Assets;
 public class PartEditor : MonoBehaviour
 {
     RoboBuild RB;
-    AnimeEditor AE;
     public int ID;
     string Name = "";
     string NewPiece = "";
     string FName = "";
-    int LockGUI = 4;
+    int LockGUI = 0;
     int selectedPiece;
     int PrevselectedPiece;
     int selectedAttach;
@@ -23,8 +22,6 @@ public class PartEditor : MonoBehaviour
     VectorString ScaleText = new VectorString(0, 0, 0);
     Vector2[] ScrollPositions = { Vector2.zero, Vector2.zero, Vector2.zero };
     Rect windowRect = new Rect(40, 80, 380, 260);
-    int ToolSelect;
-    string[] ToolsName = { "Main", "Transform", "Pieces", "Attach" };
     public GameObject Piece;
     string TextureUrl = "";
     public string folder;
@@ -32,12 +29,12 @@ public class PartEditor : MonoBehaviour
     string apFile = "";
     GameObject[] Childlist;
     bool isChildList = false;
-    bool Hide;
+    public bool Hide = true;
     //rewrite GUI simplify things into 2 menus or less
     void Start()
     {
         RB = GetComponent<RoboBuild>();
-        AE = GetComponent<AnimeEditor>();
+       
         RB.LoadPaths();
 
     }
@@ -62,7 +59,7 @@ public class PartEditor : MonoBehaviour
         if (LockGUI == 1) { GUI_Transform(10, 30); }
         else if (LockGUI == 2) { GUI_AddPart(10, 50); }
         else if (LockGUI == 3) { GUI_Attach(10, 30); }
-        else if (LockGUI == 4) { GUI_LoadData(10, 30); }
+        //else if (LockGUI == 4) { GUI_LoadData(10, 30); }
         else {
             //GUI.Label(new Rect (50,25,100,20),"Part Name");
             //Name = GUI.TextField(new Rect(120,25,100,20),Name);
@@ -110,21 +107,7 @@ public class PartEditor : MonoBehaviour
 
     }
 
-    private void GUI_LoadData(float x, float y)
-    {
-        GUI.BeginGroup(new Rect(x, y, 370, 200));
-        GUI.Box(new Rect(0, 0, 360, 200), "Load Data");
-
-        GUI.Label(new Rect(20, 30, 110, 20), "Xed output Path");
-        RB.BPpath = GUI.TextField(new Rect(20, 50, 320, 20), RB.BPpath);
-
-        GUI.Label(new Rect(20, 80, 110, 20), "Model Folder Path");
-        RB.Modelpath = GUI.TextField(new Rect(20, 100, 320, 20), RB.Modelpath);
-
-        if (GUI.Button(new Rect(10, 145, 165, 20), "Load to Skeleton Editor")) { RB.SavePaths(); RB.LoadRobo(); LockGUI = 0; UpdateTransformValues(); }
-        if (GUI.Button(new Rect(185, 145, 165, 20), "Load to Animation Editor")) { RB.SavePaths(); RB.LoadRobo(); Hide = true; AE.Hide = false; }
-        GUI.EndGroup();
-    }
+    
 
     private void GUI_AddPart(float x, float y)
     {
