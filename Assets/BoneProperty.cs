@@ -19,7 +19,8 @@ public struct BpBoneData
 
 };
 
-public static class BoneProperty {
+public static class BoneProperty
+{
 
     public static BpBoneData[] Read(string path)
     {
