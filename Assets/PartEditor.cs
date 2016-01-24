@@ -153,10 +153,11 @@ public class PartEditor : MonoBehaviour {
                         if (scen.Materials[scen.Meshes[index].MaterialIndex] != null)
                         {
                             mat.name = scen.Materials[scen.Meshes[index].MaterialIndex].Name;
+                            var textures = scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures();
 
-                            foreach (var tex in scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures())
+                            if (textures.Length > 0)
                             {
-                                mat.SetTexture((int)tex.TextureIndex, Helper.LoadTexture(Path.Combine(RB.Modelpath, tex.FilePath)));
+                                mat.mainTexture = Helper.LoadTexture(Path.Combine(RB.Modelpath, textures[0].FilePath));
                             }
                         }
 
