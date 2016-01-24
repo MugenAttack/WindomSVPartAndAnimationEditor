@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class Utils {
+public static class Utils
+{
 
- 
+
     public static Quaternion GetRotation(Matrix4x4 matrix)
     {
         var qw = Mathf.Sqrt(1f + matrix.m00 + matrix.m11 + matrix.m22) / 2;

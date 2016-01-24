@@ -8,7 +8,8 @@ using System.Linq;
 using Assets;
 using Assimp.Configs;
 
-public class RoboBuild : MonoBehaviour {
+public class RoboBuild : MonoBehaviour
+{
     public List<GameObject> parts;
     public string BPpath = "";
     public string Modelpath = "";
@@ -19,17 +20,19 @@ public class RoboBuild : MonoBehaviour {
     string AnimeIDSave = "0";
     //public List<GameObject> OrderedParts;
     int CurrentID = -1;
-    
+
     // Use this for initialization
-    void Start () {
-        
+    void Start()
+    {
+
     }
-	
-	// Update is called once per frame
-	void Update () {
-	   
-	}
- 
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
     public void setBPpath(string path)
     {
         BPpath = path;
@@ -42,11 +45,10 @@ public class RoboBuild : MonoBehaviour {
 
     public void LoadRobo()
     {
-        BpBoneData[] data = BoneProperty.Read(BPpath + "\\BoneProperty.xml");
+        BpBoneData[] data = BoneProperty.Read(Path.Combine(BPpath, "BoneProperty.xml"));
         Matrix4x4[] pMatrix = new Matrix4x4[data.Length];
-        GameObject part;
         parts = new List<GameObject>();
-        
+
         //create objects
         for (int i = 0; i < data.Length; i++)
         {
@@ -59,14 +61,14 @@ public class RoboBuild : MonoBehaviour {
                 pMatrix[i] = data[i].TransMat.transpose;
             }
 
-            part = new GameObject(data[i].Name);
+            var part = new GameObject(data[i].Name);
             Debug.Log(data[i].Name);
             parts.Add(part);
-           try
+            try
             {
                 if (File.Exists(Path.Combine(Modelpath, data[i].Windom_FileName)))
                 {
-                   Debug.Log("Exists");
+                    Debug.Log("Exists");
 
                     var scen = Importer.ImportFile(Path.Combine(Modelpath, data[i].Windom_FileName), Helper.PostProcessStepflags);
                     Mesh mesh = new Mesh();
@@ -81,10 +83,11 @@ public class RoboBuild : MonoBehaviour {
                         if (scen.Materials[scen.Meshes[index].MaterialIndex] != null)
                         {
                             mat.name = scen.Materials[scen.Meshes[index].MaterialIndex].Name;
+                            var textures = scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures();
 
-                            foreach (var tex in scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures())
+                            if (textures.Length > 0)
                             {
-                                mat.SetTexture((int)tex.TextureIndex, Helper.LoadTexture(Path.Combine(Modelpath, tex.FilePath)));
+                                mat.mainTexture = Helper.LoadTexture(Path.Combine(Modelpath, textures[0].FilePath));
                             }
                         }
 
@@ -95,7 +98,7 @@ public class RoboBuild : MonoBehaviour {
                     part.AddComponent<MeshRenderer>().materials = materials;
                 }
             }
-           catch { };
+            catch { }
 
             part.transform.position = Utils.GetPosition(pMatrix[i]);
             part.transform.rotation = Utils.GetRotation(pMatrix[i]);
@@ -122,12 +125,11 @@ public class RoboBuild : MonoBehaviour {
     {
         CurrentID = -1;
         GameObject Base = parts[0];
-        XmlWriterSettings xws = new XmlWriterSettings();
-        xws.Indent = true;
-        xw = XmlWriter.Create(BPpath + "\\BoneProperty.xml", xws);
+        XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
+        xw = XmlWriter.Create(Path.Combine(BPpath, "BoneProperty.xml"), xws);
         xw.WriteStartDocument();
         xw.WriteStartElement("BoneProperty");
-        xw.WriteAttributeString("Count",parts.Count.ToString());
+        xw.WriteAttributeString("Count", parts.Count.ToString());
 
         //write bone data
         BoneData BD = Base.GetComponent<BoneData>();
@@ -139,7 +141,7 @@ public class RoboBuild : MonoBehaviour {
         xw.WriteAttributeString("Value", (-1).ToString());
         xw.WriteEndElement();
         xw.WriteStartElement("TransMat");
-        BD.SMatrix = Matrix4x4.TRS(Base.transform.position,Base.transform.rotation,Base.transform.localScale);
+        BD.SMatrix = Matrix4x4.TRS(Base.transform.position, Base.transform.rotation, Base.transform.localScale);
         xw.WriteString(MatrixToString(BD.SMatrix.transpose));
         xw.WriteEndElement();
         xw.WriteStartElement("OffsetMat");
@@ -155,7 +157,7 @@ public class RoboBuild : MonoBehaviour {
         xw.WriteAttributeString("Value", BD.BoneFlag[0].ToString());
         xw.WriteAttributeString("Value2", BD.BoneFlag[1].ToString());
         xw.WriteEndElement();
-        xw.WriteStartElement("LimitAng"); 
+        xw.WriteStartElement("LimitAng");
         xw.WriteString(LimitAngToString(BD.LimitAng));
         xw.WriteEndElement();
         xw.WriteStartElement("Windom_FileName");
@@ -171,15 +173,12 @@ public class RoboBuild : MonoBehaviour {
         xw.Close();
     }
 
-    public void setChildren(Transform Tparent,int level,int parent)
+    public void setChildren(Transform Tparent, int level, int parent)
     {
-        GameObject Base;
-        BoneData BD;
-        for(int i = 0; i < Tparent.childCount; i++)
+        for (int i = 0; i < Tparent.childCount; i++)
         {
-            
-            Base = Tparent.GetChild(i).gameObject;
-            BD = Base.GetComponent<BoneData>();
+            var Base = Tparent.GetChild(i).gameObject;
+            var BD = Base.GetComponent<BoneData>();
             xw.WriteStartElement(Base.name);
             xw.WriteStartElement("Level");
             xw.WriteAttributeString("Value", level.ToString());
@@ -260,14 +259,14 @@ public class RoboBuild : MonoBehaviour {
     public void LoadRoboAnime(string AnimeID)
     {
         AnimeIDSave = AnimeID;
-        BC = AnimeLoader.Load(BPpath + "\\Anime_" + AnimeID + ".xml");
-         
-        for (int i = 0; i < BC.Count; i++)
+        BC = AnimeLoader.Load(Path.Combine(BPpath, "Anime_" + AnimeID + ".xml"));
+
+        foreach (BoneCurves curve in BC)
         {
             foreach (GameObject part in parts)
             {
-                if (part.name == BC[i].name)
-                { BC[i].GO = part; Debug.Log(part.name); }
+                if (part.name == curve.name)
+                { curve.GO = part; Debug.Log(part.name); }
             }
         }
 
@@ -276,21 +275,20 @@ public class RoboBuild : MonoBehaviour {
 
     public void SaveRoboAnime()
     {
-        AnimeLoader.Save(BC, BPpath + "\\Anime_" + AnimeIDSave + ".xml");
+        AnimeLoader.Save(BC, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"));
     }
 
     public void AnimeFrameGo(int Frame)
     {
-        for (int i = 0; i < BC.Count; i++)
+        foreach (BoneCurves c in BC)
         {
-            BC[i].CalculateFrame(Frame);
+            c.CalculateFrame(Frame);
         }
     }
 
     public void SavePaths()
     {
-        XmlWriterSettings xws = new XmlWriterSettings();
-        xws.Indent = true;
+        XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
         xw = XmlWriter.Create("Settings.xml", xws);
         xw.WriteStartDocument();
         xw.WriteStartElement("Settings");
@@ -308,13 +306,13 @@ public class RoboBuild : MonoBehaviour {
     public void LoadPaths()
     {
         if (File.Exists("Settings.xml"))
-        { 
-        XmlDocument Doc = new XmlDocument();
-        Doc.Load("Settings.xml");
-        XmlNode settings = Doc.SelectSingleNode("Settings");
-        BPpath = settings.ChildNodes[0].Attributes["Path"].Value;
-        Modelpath = settings.ChildNodes[1].Attributes["Path"].Value;
+        {
+            XmlDocument Doc = new XmlDocument();
+            Doc.Load("Settings.xml");
+            XmlNode settings = Doc.SelectSingleNode("Settings");
+            BPpath = settings.ChildNodes[0].Attributes["Path"].Value;
+            Modelpath = settings.ChildNodes[1].Attributes["Path"].Value;
         }
-        
+
     }
 }

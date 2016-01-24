@@ -1,39 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AnimeEditor : MonoBehaviour {
+public class AnimeEditor : MonoBehaviour
+{
     public bool Hide = true;
-    public float FrameSlider = 0f;
+    public float FrameSlider;
     public string sFrame = "";
     public string sFrameC = "";
     public string speed = "";
     VectorString PositionText = new VectorString(0, 0, 0);
-    
+
     GameObject Piece;
     RoboBuild RB;
     string AnimeID = "";
-    int guilock = 0;
+    int guilock;
     float prevValue;
-    int selection = 0;
+    int selection;
     int prevmode = 0;
-    int editmode = 0;
-    string[] slist = new string[] { "Parts", "Frames" };
-    string[] elist = new string[] { "Position", "Rotation", "Scale" };
+    int editmode;
+    string[] slist = { "Parts", "Frames" };
+    string[] elist = { "Position", "Rotation", "Scale" };
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         RB = GetComponent<RoboBuild>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     void OnGUI()
     {
 
-        
-       if (!Hide)
+
+        if (!Hide)
         {
             if (guilock == 0)
                 GUI_AnimeID();
@@ -43,12 +46,12 @@ public class AnimeEditor : MonoBehaviour {
                 GUI_BoneMenu();
             }
         }
-        
+
     }
 
     void GUI_AnimeID()
     {
-        GUI.Box(new Rect(Screen.width / 2 - 100, Screen.height/2 - 50, 200, 100), "Enter Animation ID");
+        GUI.Box(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 50, 200, 100), "Enter Animation ID");
         AnimeID = GUI.TextField(new Rect(Screen.width / 2 - 25, Screen.height / 2 - 10, 50, 20), AnimeID);
         if (GUI.Button(new Rect(Screen.width / 2 - 50, Screen.height / 2 + 20, 100, 20), "Load")) { RB.LoadRoboAnime(AnimeID); guilock = 1; }
     }
@@ -63,7 +66,7 @@ public class AnimeEditor : MonoBehaviour {
         sFrame = GUI.TextField(new Rect(Screen.width / 2 - 100, Screen.height - 75, 40, 20), sFrame);
         if (sFrame != sFrameC)
             float.TryParse(sFrame, out FrameSlider);
-        
+
         sFrameC = sFrame;
         FrameSlider = GUI.HorizontalSlider(new Rect(Screen.width / 2 - 200, Screen.height - 50, 400, 30), FrameSlider, 0f, 150f);
         sFrame = Mathf.RoundToInt(FrameSlider).ToString();
@@ -99,7 +102,7 @@ public class AnimeEditor : MonoBehaviour {
             if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove")) { }
         }
         else
-        { 
+        {
             GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 260), "Parts");
         }
         selection = GUI.SelectionGrid(new Rect(30, Screen.height / 2 + 165, 235, 20), selection, slist, 2);
@@ -110,7 +113,7 @@ public class AnimeEditor : MonoBehaviour {
     {
         try
         {
-           // PositionText = new VectorString(Piece.transform.position);
+            // PositionText = new VectorString(Piece.transform.position);
             //RotationText = new VectorString(Piece.transform.eulerAngles);
             //ScaleText = new VectorString(Piece.transform.localScale);
         }
@@ -121,9 +124,9 @@ public class AnimeEditor : MonoBehaviour {
     {
         try
         {
-           // Piece.transform.position = PositionText.getVector3();
-           // Piece.transform.eulerAngles = RotationText.getVector3();
-           // Piece.transform.localScale = ScaleText.getVector3();
+            // Piece.transform.position = PositionText.getVector3();
+            // Piece.transform.eulerAngles = RotationText.getVector3();
+            // Piece.transform.localScale = ScaleText.getVector3();
         }
         catch { }
     }

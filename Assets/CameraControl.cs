@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraControl : MonoBehaviour {
+public class CameraControl : MonoBehaviour
+{
     public float Speed = 1;
     public Vector3 lookAtpos = Vector3.up;
     public PartEditor PE;
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         transform.position = new Vector3(0, 1, 1);
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         lookAtpos = lookAtpos + (Vector3.up * Speed * Input.GetAxis("Vertical") * Time.deltaTime);
         transform.position = transform.position + (Vector3.up * Speed * Input.GetAxis("Vertical") * Time.deltaTime);
         transform.position = transform.position + (transform.forward * Speed * Input.GetAxis("Zoom") * Time.deltaTime);

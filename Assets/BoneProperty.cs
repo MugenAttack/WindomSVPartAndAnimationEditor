@@ -19,7 +19,8 @@ public struct BpBoneData
 
 };
 
-public static class BoneProperty {
+public static class BoneProperty
+{
 
     public static BpBoneData[] Read(string path)
     {
@@ -59,27 +60,25 @@ public static class BoneProperty {
     {
         string[] s = Val.Split(" ".ToCharArray());
 
-        Matrix4x4 m = new Matrix4x4();
-
-        m.m00 = float.Parse(s[0]);
-        m.m01 = float.Parse(s[1]);
-        m.m02 = float.Parse(s[2]);
-        m.m03 = float.Parse(s[3]);
-
-        m.m10 = float.Parse(s[4]);
-        m.m11 = float.Parse(s[5]);
-        m.m12 = float.Parse(s[6]);
-        m.m13 = float.Parse(s[7]);
-
-        m.m20 = float.Parse(s[8]);
-        m.m21 = float.Parse(s[9]);
-        m.m22 = float.Parse(s[10]);
-        m.m23 = float.Parse(s[11]);
-
-        m.m30 = float.Parse(s[12]);
-        m.m31 = float.Parse(s[13]);
-        m.m32 = float.Parse(s[14]);
-        m.m33 = float.Parse(s[15]);
+        Matrix4x4 m = new Matrix4x4
+        {
+            m00 = float.Parse(s[0]),
+            m01 = float.Parse(s[1]),
+            m02 = float.Parse(s[2]),
+            m03 = float.Parse(s[3]),
+            m10 = float.Parse(s[4]),
+            m11 = float.Parse(s[5]),
+            m12 = float.Parse(s[6]),
+            m13 = float.Parse(s[7]),
+            m20 = float.Parse(s[8]),
+            m21 = float.Parse(s[9]),
+            m22 = float.Parse(s[10]),
+            m23 = float.Parse(s[11]),
+            m30 = float.Parse(s[12]),
+            m31 = float.Parse(s[13]),
+            m32 = float.Parse(s[14]),
+            m33 = float.Parse(s[15])
+        };
 
         return m;
     }

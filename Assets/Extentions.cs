@@ -15,12 +15,14 @@ namespace Assets
 
         public static Mesh ToUnityMesh(this Assimp.Mesh mesh)
         {
-            Mesh result = new Mesh();
-            result.name = mesh.Name;
-            result.vertices = mesh.Vertices.Select(x => x.ToUnityVector3()).ToArray();
-            result.triangles = mesh.GetIntIndices().Reverse().ToArray();
-            result.normals = mesh.Normals.Select(x => x.ToUnityVector3()).ToArray();
-            result.uv = mesh.GetTextureCoords(0).Select(x => new Vector2(x.X, x.Y)).ToArray();
+            Mesh result = new Mesh
+            {
+                name = mesh.Name,
+                vertices = mesh.Vertices.Select(x => x.ToUnityVector3()).ToArray(),
+                triangles = mesh.GetIntIndices().Reverse().ToArray(),
+                normals = mesh.Normals.Select(x => x.ToUnityVector3()).ToArray(),
+                uv = mesh.GetTextureCoords(0).Select(x => new Vector2(x.X, x.Y)).ToArray()
+            };
             return result;
         }
 

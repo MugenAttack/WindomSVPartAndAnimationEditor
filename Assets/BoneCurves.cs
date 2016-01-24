@@ -25,7 +25,8 @@ public struct ScalePoint
     public int PowVal;
 }
 
-public class BoneCurves {
+public class BoneCurves
+{
     public string name;
     public List<PosPoint> PosCurve;
     public List<RotPoint> RotCurve;
@@ -37,7 +38,7 @@ public class BoneCurves {
         RotCurve = new List<RotPoint>();
         ScaleCurve = new List<ScalePoint>();
     }
-    
+
     public void CalculateFrame(int Frame)
     {
         int LowerFrame = -1;
@@ -67,7 +68,7 @@ public class BoneCurves {
             if (LowerFrame != -1 && HigherFrame != -1)
             {
                 float l = (Frame - PosCurve[LowerFrame].Frame) / (PosCurve[HigherFrame].Frame - PosCurve[LowerFrame].Frame);
-                GO.transform.localPosition = Vector3.Lerp(PosCurve[LowerFrame].Value, PosCurve[HigherFrame].Value, l); 
+                GO.transform.localPosition = Vector3.Lerp(PosCurve[LowerFrame].Value, PosCurve[HigherFrame].Value, l);
             }
 
         }
