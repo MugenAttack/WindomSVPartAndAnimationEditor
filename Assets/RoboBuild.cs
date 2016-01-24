@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEngine.UI;
+using System.Linq;
+using Assets;
+using Assimp.Configs;
 
 public class RoboBuild : MonoBehaviour {
     public List<GameObject> parts;
@@ -11,7 +14,7 @@ public class RoboBuild : MonoBehaviour {
     public string Modelpath = "";
     public bool parent = true;
     XmlWriter xw;
-    public ObjImporter obj = new ObjImporter();
+    public Assimp.AssimpImporter Importer = new Assimp.AssimpImporter();
     public List<BoneCurves> BC;
     string AnimeIDSave = "0";
     //public List<GameObject> OrderedParts;
@@ -61,13 +64,16 @@ public class RoboBuild : MonoBehaviour {
             parts.Add(part);
            try
             {
-                if (File.Exists(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj"))
+                if (File.Exists(Modelpath + "\\" + data[i].Windom_FileName))
                 {
                    Debug.Log("Exists");
-                    
-                    Material m = new Material(Shader.Find("Standard"));
-                    part.AddComponent<MeshRenderer>().material = m;
-                    part.AddComponent<MeshFilter>().mesh = obj.ImportFile(Modelpath + "\\" + data[i].Windom_FileName.Substring(0, data[i].Windom_FileName.Length - 2) + ".obj");
+
+                    var scen = Importer.ImportFile(Modelpath + "\\" + data[i].Windom_FileName, Assimp.PostProcessSteps.MakeLeftHanded);
+                    Mesh mesh = new Mesh();
+                    mesh.CombineMeshes(scen.Meshes.Select(x => new CombineInstance() { mesh = x.ToUnityMesh(), transform = scen.RootNode.Transform.ToUnityMatrix() }).ToArray(), false);
+
+                    part.AddComponent<MeshFilter>().mesh = mesh;
+                    part.AddComponent<MeshRenderer>().materials = scen.Materials.Select( m => m.ToUnityMaterial()).ToArray();
                 }
             }
            catch { };
