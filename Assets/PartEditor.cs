@@ -138,14 +138,33 @@ public class PartEditor : MonoBehaviour {
             RB.parts.Add(newPart);
            try
            {
-                if (File.Exists(RB.Modelpath + "\\" + apFile))
+                if (File.Exists(Path.Combine(RB.Modelpath, apFile)))
                 {
-                    var scen = RB.Importer.ImportFile(RB.Modelpath + "\\" + apFile, Assimp.PostProcessSteps.MakeLeftHanded);
+                    var scen = RB.Importer.ImportFile(Path.Combine(RB.Modelpath, apFile), Helper.PostProcessStepflags);
                     Mesh mesh = new Mesh();
                     mesh.CombineMeshes(scen.Meshes.Select(c => new CombineInstance() { mesh = c.ToUnityMesh(), transform = scen.RootNode.Transform.ToUnityMatrix() }).ToArray(), false);
 
+                    Material[] materials = new Material[scen.Meshes.Length];
+
+                    for (int index = 0; index < materials.Length; index++)
+                    {
+                        var mat = new Material(Shader.Find("Standard"));
+
+                        if (scen.Materials[scen.Meshes[index].MaterialIndex] != null)
+                        {
+                            mat.name = scen.Materials[scen.Meshes[index].MaterialIndex].Name;
+
+                            foreach (var tex in scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures())
+                            {
+                                mat.SetTexture((int)tex.TextureIndex, Helper.LoadTexture(Path.Combine(RB.Modelpath, tex.FilePath)));
+                            }
+                        }
+
+                        materials[index] = mat;
+                    }
+
                     newPart.AddComponent<MeshFilter>().mesh = mesh;
-                    newPart.AddComponent<MeshRenderer>().materials = scen.Materials.Select(m => m.ToUnityMaterial()).ToArray();
+                    newPart.AddComponent<MeshRenderer>().materials = materials;
                 }
            }
           catch { };

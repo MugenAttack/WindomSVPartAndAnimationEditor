@@ -36,14 +36,9 @@ namespace Assets
             return unityMatrix;
         }
 
-        public static Material ToUnityMaterial(this Assimp.Material mat)
+        public static Color ToUnityColor(this Assimp.Color4D color)
         {
-            Material result = new Material(Shader.Find("Standard"));
-            result.name = mat.Name;
-
-            // TODO: Add textures and color and what not.
-
-            return result;
+            return new Color(color.R, color.G, color.B, color.A);
         }
     }
 }

@@ -64,18 +64,35 @@ public class RoboBuild : MonoBehaviour {
             parts.Add(part);
            try
             {
-                if (File.Exists(Modelpath + "\\" + data[i].Windom_FileName))
+                if (File.Exists(Path.Combine(Modelpath, data[i].Windom_FileName)))
                 {
                    Debug.Log("Exists");
 
-                    var scen = Importer.ImportFile(Modelpath + "\\" + data[i].Windom_FileName, Assimp.PostProcessSteps.MakeLeftHanded);
+                    var scen = Importer.ImportFile(Path.Combine(Modelpath, data[i].Windom_FileName), Helper.PostProcessStepflags);
                     Mesh mesh = new Mesh();
                     mesh.CombineMeshes(scen.Meshes.Select(x => new CombineInstance() { mesh = x.ToUnityMesh(), transform = scen.RootNode.Transform.ToUnityMatrix() }).ToArray(), false);
 
+                    Material[] materials = new Material[scen.Meshes.Length];
+
+                    for (int index = 0; index < materials.Length; index++)
+                    {
+                        var mat = new Material(Shader.Find("Standard"));
+
+                        if (scen.Materials[scen.Meshes[index].MaterialIndex] != null)
+                        {
+                            mat.name = scen.Materials[scen.Meshes[index].MaterialIndex].Name;
+
+                            foreach (var tex in scen.Materials[scen.Meshes[index].MaterialIndex].GetAllTextures())
+                            {
+                                mat.SetTexture((int)tex.TextureIndex, Helper.LoadTexture(Path.Combine(Modelpath, tex.FilePath)));
+                            }
+                        }
+
+                        materials[index] = mat;
+                    }
+
                     part.AddComponent<MeshFilter>().mesh = mesh;
-                    part.AddComponent<MeshRenderer>().materials = scen.Materials.Select( m => m.ToUnityMaterial()).ToArray();
-                 
-                  
+                    part.AddComponent<MeshRenderer>().materials = materials;
                 }
             }
            catch { };

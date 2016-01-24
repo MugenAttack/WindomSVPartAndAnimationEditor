@@ -71,6 +71,7 @@
     <Compile Include="Assets\BoneData.cs" />
     <Compile Include="Assets\BoneProperty.cs" />
     <Compile Include="Assets\CameraControl.cs" />
+    <Compile Include="Assets\Helper.cs" />
     <Compile Include="Assets\PartEditor.cs" />
     <Compile Include="Assets\RoboBuild.cs" />
     <Compile Include="Assets\Utils.cs" />
