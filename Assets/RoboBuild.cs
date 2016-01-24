@@ -74,6 +74,8 @@ public class RoboBuild : MonoBehaviour {
 
                     part.AddComponent<MeshFilter>().mesh = mesh;
                     part.AddComponent<MeshRenderer>().materials = scen.Materials.Select( m => m.ToUnityMaterial()).ToArray();
+                 
+                  
                 }
             }
            catch { };
@@ -252,6 +254,7 @@ public class RoboBuild : MonoBehaviour {
             }
         }
 
+        AnimeFrameGo(0);
     }
 
     public void SaveRoboAnime()
