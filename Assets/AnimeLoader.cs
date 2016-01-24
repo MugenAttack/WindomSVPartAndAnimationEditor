@@ -17,8 +17,7 @@ public static class AnimeLoader
         foreach (XmlNode Bone in BoneData.ChildNodes)
         {
             int keyvalue = 0;
-            BoneCurves BC = new BoneCurves();
-            BC.name = Bone.Attributes["Text"].Value;
+            BoneCurves BC = new BoneCurves { name = Bone.Attributes["Text"].Value };
             //Debug.Log(Bone.Name);
 
             XmlNodeList childs = Bone.ChildNodes;

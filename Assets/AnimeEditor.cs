@@ -4,7 +4,7 @@ using System.Collections;
 public class AnimeEditor : MonoBehaviour
 {
     public bool Hide = true;
-    public float FrameSlider = 0f;
+    public float FrameSlider;
     public string sFrame = "";
     public string sFrameC = "";
     public string speed = "";
@@ -13,13 +13,13 @@ public class AnimeEditor : MonoBehaviour
     GameObject Piece;
     RoboBuild RB;
     string AnimeID = "";
-    int guilock = 0;
+    int guilock;
     float prevValue;
-    int selection = 0;
+    int selection;
     int prevmode = 0;
-    int editmode = 0;
-    string[] slist = new string[] { "Parts", "Frames" };
-    string[] elist = new string[] { "Position", "Rotation", "Scale" };
+    int editmode;
+    string[] slist = { "Parts", "Frames" };
+    string[] elist = { "Position", "Rotation", "Scale" };
     // Use this for initialization
     void Start()
     {

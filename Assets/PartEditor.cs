@@ -17,7 +17,7 @@ public class PartEditor : MonoBehaviour
     int LockGUI = 4;
     int selectedPiece;
     int PrevselectedPiece;
-    int selectedAttach = 0;
+    int selectedAttach;
     VectorString PositionText = new VectorString(0, 0, 0);
     VectorString RotationText = new VectorString(0, 0, 0);
     VectorString ScaleText = new VectorString(0, 0, 0);
@@ -32,7 +32,7 @@ public class PartEditor : MonoBehaviour
     string apFile = "";
     GameObject[] Childlist;
     bool isChildList = false;
-    bool Hide = false;
+    bool Hide;
     //rewrite GUI simplify things into 2 menus or less
     void Start()
     {
@@ -315,7 +315,7 @@ public class PartEditor : MonoBehaviour
     {
         if (RB.parts[selectedPiece].transform.childCount == 0)
         {
-            GameObject.Destroy(RB.parts[selectedPiece]);
+            Destroy(RB.parts[selectedPiece]);
             RB.parts.RemoveAt(selectedPiece);
             selectedPiece = 0;
         }

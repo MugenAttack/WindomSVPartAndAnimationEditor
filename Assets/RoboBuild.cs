@@ -47,7 +47,6 @@ public class RoboBuild : MonoBehaviour
     {
         BpBoneData[] data = BoneProperty.Read(Path.Combine(BPpath, "BoneProperty.xml"));
         Matrix4x4[] pMatrix = new Matrix4x4[data.Length];
-        GameObject part;
         parts = new List<GameObject>();
 
         //create objects
@@ -62,7 +61,7 @@ public class RoboBuild : MonoBehaviour
                 pMatrix[i] = data[i].TransMat.transpose;
             }
 
-            part = new GameObject(data[i].Name);
+            var part = new GameObject(data[i].Name);
             Debug.Log(data[i].Name);
             parts.Add(part);
             try
@@ -126,8 +125,7 @@ public class RoboBuild : MonoBehaviour
     {
         CurrentID = -1;
         GameObject Base = parts[0];
-        XmlWriterSettings xws = new XmlWriterSettings();
-        xws.Indent = true;
+        XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
         xw = XmlWriter.Create(Path.Combine(BPpath, "BoneProperty.xml"), xws);
         xw.WriteStartDocument();
         xw.WriteStartElement("BoneProperty");
@@ -177,13 +175,10 @@ public class RoboBuild : MonoBehaviour
 
     public void setChildren(Transform Tparent, int level, int parent)
     {
-        GameObject Base;
-        BoneData BD;
         for (int i = 0; i < Tparent.childCount; i++)
         {
-
-            Base = Tparent.GetChild(i).gameObject;
-            BD = Base.GetComponent<BoneData>();
+            var Base = Tparent.GetChild(i).gameObject;
+            var BD = Base.GetComponent<BoneData>();
             xw.WriteStartElement(Base.name);
             xw.WriteStartElement("Level");
             xw.WriteAttributeString("Value", level.ToString());
@@ -266,12 +261,12 @@ public class RoboBuild : MonoBehaviour
         AnimeIDSave = AnimeID;
         BC = AnimeLoader.Load(Path.Combine(BPpath, "Anime_" + AnimeID + ".xml"));
 
-        for (int i = 0; i < BC.Count; i++)
+        foreach (BoneCurves curve in BC)
         {
             foreach (GameObject part in parts)
             {
-                if (part.name == BC[i].name)
-                { BC[i].GO = part; Debug.Log(part.name); }
+                if (part.name == curve.name)
+                { curve.GO = part; Debug.Log(part.name); }
             }
         }
 
@@ -285,16 +280,15 @@ public class RoboBuild : MonoBehaviour
 
     public void AnimeFrameGo(int Frame)
     {
-        for (int i = 0; i < BC.Count; i++)
+        foreach (BoneCurves c in BC)
         {
-            BC[i].CalculateFrame(Frame);
+            c.CalculateFrame(Frame);
         }
     }
 
     public void SavePaths()
     {
-        XmlWriterSettings xws = new XmlWriterSettings();
-        xws.Indent = true;
+        XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
         xw = XmlWriter.Create("Settings.xml", xws);
         xw.WriteStartDocument();
         xw.WriteStartElement("Settings");
