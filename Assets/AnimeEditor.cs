@@ -17,11 +17,13 @@ public class AnimeEditor : MonoBehaviour
     float prevValue;
     int selection;
     int prevmode = 0;
-    int editmode;
+    int editmode = 0;
+    int editModeChange = 0;
     int selectedFrame;
     int prevSelectedFrame;
     int frameNum;
     int indexBC = 0;
+    
     string[] slist = { "Parts", "Frames" };
     string[] elist = { "Position", "Rotation", "Scale" };
     Vector2[] ScrollPositions = { Vector2.zero, Vector2.zero, Vector2.zero };
@@ -40,7 +42,7 @@ public class AnimeEditor : MonoBehaviour
     void OnGUI()
     {
 
-
+        UpdateTransformValues();
         if (!Hide)
         {
             if (guilock == 0)
@@ -49,6 +51,9 @@ public class AnimeEditor : MonoBehaviour
             {
                 GUI_FrameSlider();
                 GUI_BoneMenu();
+
+                GUI.Box(new Rect(Screen.width - 130, 50, 120, 40), "");
+                if (GUI.Button(new Rect(Screen.width - 115, 60, 90, 20),"Save")){ };
             }
         }
 
@@ -100,12 +105,18 @@ public class AnimeEditor : MonoBehaviour
         PositionText.z = GUI.TextField(new Rect(190, Screen.height / 2 - 160, 50, 20), PositionText.z);
         editmode = GUI.SelectionGrid(new Rect(30, Screen.height / 2 - 130, 235, 20), editmode, elist, 3);
 
+        if (editmode != editModeChange)
+            UpdateTransformValues();
+        editModeChange = editmode;
+
+        ApplyTransformValues();
         try
         {
             if (selection == 1)
             {
                 GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 235), "Frames");
                 GUI_Framelist();
+                
                 if (GUI.Button(new Rect(30, Screen.height / 2 + 140, 116, 20), "Add")) { }
                 if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove"))
                 {
@@ -122,10 +133,11 @@ public class AnimeEditor : MonoBehaviour
                             break;
                     }
                 }
+                
                 if (selectedFrame != prevSelectedFrame)
                     RB.AnimeFrameGo(frameNum);
                 prevSelectedFrame = selectedFrame;
-
+                UpdateTransformValues();
                 if (checkIfEmpty())
                     indexBC = 0;
             }
@@ -152,9 +164,18 @@ public class AnimeEditor : MonoBehaviour
     {
         try
         {
-            // PositionText = new VectorString(Piece.transform.position);
-            //RotationText = new VectorString(Piece.transform.eulerAngles);
-            //ScaleText = new VectorString(Piece.transform.localScale);
+            switch (elist[editmode])
+            {
+                case "Position":
+                    PositionText = new VectorString(RB.BC[indexBC].PosCurve[selectedFrame].Value);
+                    break;
+                case "Rotation":
+                    PositionText = new VectorString(RB.BC[indexBC].RotCurve[selectedFrame].Value.eulerAngles);
+                    break;
+                case "Scale":
+                    PositionText = new VectorString(RB.BC[indexBC].ScaleCurve[selectedFrame].Value);
+                    break;
+            }
         }
         catch { }
     }
@@ -163,9 +184,24 @@ public class AnimeEditor : MonoBehaviour
     {
         try
         {
-            // Piece.transform.position = PositionText.getVector3();
-            // Piece.transform.eulerAngles = RotationText.getVector3();
-            // Piece.transform.localScale = ScaleText.getVector3();
+            switch (elist[editmode])
+            {
+                case "Position":
+                    PosPoint ptemp = RB.BC[indexBC].PosCurve[selectedFrame];
+                    ptemp.Value = PositionText.getVector3();
+                    RB.BC[indexBC].PosCurve[selectedFrame] = ptemp;
+                    break;
+                case "Rotation":
+                    RotPoint rtemp = RB.BC[indexBC].RotCurve[selectedFrame];
+                    rtemp.Value = Quaternion.Euler(PositionText.getVector3());
+                    RB.BC[indexBC].RotCurve[selectedFrame] = rtemp;
+                    break;
+                case "Scale":
+                    ScalePoint stemp = RB.BC[indexBC].ScaleCurve[selectedFrame];
+                    stemp.Value = PositionText.getVector3();
+                    RB.BC[indexBC].ScaleCurve[selectedFrame] = stemp;
+                    break;
+            }
         }
         catch { }
     }
