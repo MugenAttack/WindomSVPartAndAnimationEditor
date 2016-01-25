@@ -21,6 +21,7 @@ public class AnimeEditor : MonoBehaviour
     int selectedFrame;
     int prevSelectedFrame;
     int frameNum;
+    int indexBC = 0;
     string[] slist = { "Parts", "Frames" };
     string[] elist = { "Position", "Rotation", "Scale" };
     Vector2[] ScrollPositions = { Vector2.zero, Vector2.zero, Vector2.zero };
@@ -99,18 +100,34 @@ public class AnimeEditor : MonoBehaviour
         PositionText.z = GUI.TextField(new Rect(190, Screen.height / 2 - 160, 50, 20), PositionText.z);
         editmode = GUI.SelectionGrid(new Rect(30, Screen.height / 2 - 130, 235, 20), editmode, elist, 3);
 
-        try {
+        try
+        {
             if (selection == 1)
             {
                 GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 235), "Frames");
                 GUI_Framelist();
                 if (GUI.Button(new Rect(30, Screen.height / 2 + 140, 116, 20), "Add")) { }
-                if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove")) { }
+                if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove"))
+                {
+                    switch (elist[editmode])
+                    {
+                        case "Position":
+                            RB.BC[indexBC].PosCurve.RemoveAt(selectedFrame);
+                            break;
+                        case "Rotation":
+                            RB.BC[indexBC].RotCurve.RemoveAt(selectedFrame);
+                            break;
+                        case "Scale":
+                            RB.BC[indexBC].ScaleCurve.RemoveAt(selectedFrame);
+                            break;
+                    }
+                }
                 if (selectedFrame != prevSelectedFrame)
                     RB.AnimeFrameGo(frameNum);
                 prevSelectedFrame = selectedFrame;
 
-
+                if (checkIfEmpty())
+                    indexBC = 0;
             }
             else
             {
@@ -173,7 +190,7 @@ public class AnimeEditor : MonoBehaviour
         bool hasFrames = false;
         List<string> framelist = new List<string>();
         List<int> frameNumlist = new List<int>();
-        int indexBC = 0;
+
         for (int i = 0; i < RB.BC.Count; i++)
         {
             if (RB.BC[i].GO == RB.parts[selectedPiece])
@@ -207,14 +224,29 @@ public class AnimeEditor : MonoBehaviour
                     }
                     break;
             }
-            if (framelist.Count - 1 < selectedFrame)
-                selectedFrame = 0;
+
+            if (framelist.Count != 0)
+            {
+                if (framelist.Count < selectedFrame)
+                    selectedFrame = 0;
 
                 ScrollPositions[0] = GUI.BeginScrollView(new Rect(30, Screen.height / 2 - 75, 235, 210), ScrollPositions[0], new Rect(0, 0, 219, framelist.Count * 25));
                 selectedFrame = GUI.SelectionGrid(new Rect(0, 0, 219, (float)25 * (float)framelist.Count), selectedFrame, framelist.ToArray(), 1);
                 frameNum = frameNumlist[selectedFrame];
                 GUI.EndScrollView();
-           
+            }
+            else
+                GUI.Label(new Rect(30, Screen.height / 2 - 75, 235, 210), "No frame data is currently in the curve, press add frame to add keyframes to the curve");
+
         }
+        else
+            GUI.Label(new Rect(30, Screen.height / 2 - 75, 235, 210), "this part doesn't have any animation data, press add frame to create animation data and add one frame to selected curve");
+    }
+
+    private bool checkIfEmpty()
+    {
+        if (RB.BC[indexBC].PosCurve.Count == 0 && RB.BC[indexBC].RotCurve.Count == 0 && RB.BC[indexBC].ScaleCurve.Count == 0)
+        { RB.BC.RemoveAt(indexBC); return true; }
+        return false;
     }
 }
