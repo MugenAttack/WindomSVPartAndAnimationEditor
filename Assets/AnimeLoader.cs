@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using System.IO;
 public static class AnimeLoader
 {
 
@@ -89,13 +90,16 @@ public static class AnimeLoader
         return BClist;
     }
 
-    public static void Save(List<BoneCurves> Bones, string file)
+    public static void Save(List<BoneCurves> Bones, string file, List<GameObject> GOs)
     {
+        XmlDocument Doc = new XmlDocument();
+        Doc.Load(file);
+            
+        Doc.SelectSingleNode("AnimeName/BoneData");
+        Doc.RemoveAll();
+        
 
-
-
-
-
+                
 
 
 

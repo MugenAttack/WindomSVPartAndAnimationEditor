@@ -15,6 +15,7 @@ public class AnimeEditor : MonoBehaviour
     string AnimeID = "";
     int guilock;
     float prevValue;
+    int prevselection;
     int selection;
     int prevmode = 0;
     int editmode = 0;
@@ -23,7 +24,8 @@ public class AnimeEditor : MonoBehaviour
     int prevSelectedFrame;
     int frameNum;
     int indexBC = 0;
-    
+    string calctype = "0";
+    string powval = "1";
     string[] slist = { "Parts", "Frames" };
     string[] elist = { "Position", "Rotation", "Scale" };
     Vector2[] ScrollPositions = { Vector2.zero, Vector2.zero, Vector2.zero };
@@ -53,7 +55,7 @@ public class AnimeEditor : MonoBehaviour
                 GUI_BoneMenu();
 
                 GUI.Box(new Rect(Screen.width - 130, 50, 120, 40), "");
-                if (GUI.Button(new Rect(Screen.width - 115, 60, 90, 20),"Save")){ };
+                if (GUI.Button(new Rect(Screen.width - 115, 60, 90, 20), "Save")) { };
             }
         }
 
@@ -106,7 +108,7 @@ public class AnimeEditor : MonoBehaviour
         editmode = GUI.SelectionGrid(new Rect(30, Screen.height / 2 - 130, 235, 20), editmode, elist, 3);
 
         if (editmode != editModeChange)
-            UpdateTransformValues();
+        { UpdateTransformValues(); UpdateCalcType(); }
         editModeChange = editmode;
 
         ApplyTransformValues();
@@ -114,10 +116,155 @@ public class AnimeEditor : MonoBehaviour
         {
             if (selection == 1)
             {
-                GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 235), "Frames");
+                GUI.Box(new Rect(30, Screen.height / 2 - 100, 235, 205), RB.parts[selectedPiece].name + " Frames");
                 GUI_Framelist();
-                
-                if (GUI.Button(new Rect(30, Screen.height / 2 + 140, 116, 20), "Add")) { }
+                GUI.Label(new Rect(35, Screen.height / 2 + 115, 60, 20), "CalcType");
+                calctype = GUI.TextField(new Rect(95, Screen.height / 2 + 115, 50, 20), calctype);
+                GUI.Label(new Rect(160, Screen.height / 2 + 115, 60, 20), "PowVal");
+                powval = GUI.TextField(new Rect(210, Screen.height / 2 + 115, 50, 20), powval);
+                ApplyCalcType();
+                if (GUI.Button(new Rect(30, Screen.height / 2 + 140, 116, 20), "Add"))
+                {
+                    bool hasFrames = false;
+                    for (int i = 0; i < RB.BC.Count; i++)
+                    {
+                        if (RB.BC[i].GO == RB.parts[selectedPiece])
+                        { hasFrames = true;   break; }
+
+                    }
+
+                    if (!hasFrames)
+                    {
+                        
+                        RB.BC.Add(new BoneCurves());
+                        indexBC = RB.BC.Count - 1;
+                        RB.BC[indexBC].GO = RB.parts[selectedPiece];
+                        RB.BC[indexBC].name = RB.parts[selectedPiece].name;
+                       
+                        Debug.Log("test");
+                    }
+
+                    switch (elist[editmode])
+                    {
+                        case "Position":
+                            if (RB.BC[indexBC].PosCurve.Count == 0)
+                            {
+                                PosPoint PP = new PosPoint();
+                                PP.Frame = 0;
+                                PP.Value = Vector3.zero;
+                                PP.calctype = 0;
+                                PP.PowVal = 0;
+                                RB.BC[indexBC].PosCurve.Add(PP);
+                            }
+                            else
+                            {
+                                if (!isFrameOccupied(Mathf.RoundToInt(FrameSlider)))
+                                {
+
+                                    int newFramePos = Mathf.RoundToInt(FrameSlider);
+                                    int insertFrame = -1;
+                                    for (int i = 0; i < RB.BC[indexBC].PosCurve.Count; i++)
+                                    {
+                                        if (RB.BC[indexBC].PosCurve[i].Frame > newFramePos && (insertFrame == -1 || RB.BC[indexBC].PosCurve[i].Frame < RB.BC[indexBC].PosCurve[insertFrame].Frame))
+                                            insertFrame = i;
+                                    }
+
+                                    if (insertFrame == -1)
+                                    {
+                                        PosPoint FPP = RB.BC[indexBC].PosCurve[RB.BC[indexBC].PosCurve.Count - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].PosCurve.Add(FPP);
+                                    }
+                                    else
+                                    {
+                                        PosPoint FPP = RB.BC[indexBC].PosCurve[insertFrame - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].PosCurve.Insert(insertFrame, FPP);
+                                    }
+                                }
+
+                            }
+                            break;
+                        case "Rotation":
+                            if (RB.BC[indexBC].RotCurve.Count == 0)
+                            {
+                                RotPoint RP = new RotPoint();
+                                RP.Frame = 0;
+                                RP.Value = Quaternion.identity;
+                                RP.calctype = 0;
+                                RP.PowVal = 0;
+                                RB.BC[indexBC].RotCurve.Add(RP);
+                            }
+                            else
+                            {
+                                if (!isFrameOccupied(Mathf.RoundToInt(FrameSlider)))
+                                {
+
+                                    int newFramePos = Mathf.RoundToInt(FrameSlider);
+                                    int insertFrame = -1;
+                                    for (int i = 0; i < RB.BC[indexBC].RotCurve.Count; i++)
+                                    {
+                                        if (RB.BC[indexBC].RotCurve[i].Frame > newFramePos && (insertFrame == -1 || RB.BC[indexBC].RotCurve[i].Frame < RB.BC[indexBC].RotCurve[insertFrame].Frame))
+                                            insertFrame = i;
+                                    }
+
+                                    if (insertFrame == -1)
+                                    {
+                                        RotPoint FPP = RB.BC[indexBC].RotCurve[RB.BC[indexBC].RotCurve.Count - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].RotCurve.Add(FPP);
+                                    }
+                                    else
+                                    {
+                                        RotPoint FPP = RB.BC[indexBC].RotCurve[insertFrame - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].RotCurve.Insert(insertFrame, FPP);
+                                    }
+                                }
+
+                            }
+                            break;
+                        case "Scale":
+                            if (RB.BC[indexBC].ScaleCurve.Count == 0)
+                            {
+                                ScalePoint SP = new ScalePoint();
+                                SP.Frame = 0;
+                                SP.Value = Vector3.zero;
+                                SP.calctype = 0;
+                                SP.PowVal = 0;
+                                RB.BC[indexBC].ScaleCurve.Add(SP);
+                            }
+                            else
+                            {
+                                if (!isFrameOccupied(Mathf.RoundToInt(FrameSlider)))
+                                {
+
+                                    int newFramePos = Mathf.RoundToInt(FrameSlider);
+                                    int insertFrame = -1;
+                                    for (int i = 0; i < RB.BC[indexBC].ScaleCurve.Count; i++)
+                                    {
+                                        if (RB.BC[indexBC].ScaleCurve[i].Frame > newFramePos && (insertFrame == -1 || RB.BC[indexBC].ScaleCurve[i].Frame < RB.BC[indexBC].ScaleCurve[insertFrame].Frame))
+                                            insertFrame = i;
+                                    }
+
+                                    if (insertFrame == -1)
+                                    {
+                                        ScalePoint FPP = RB.BC[indexBC].ScaleCurve[RB.BC[indexBC].ScaleCurve.Count - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].ScaleCurve.Add(FPP);
+                                    }
+                                    else
+                                    {
+                                        ScalePoint FPP = RB.BC[indexBC].ScaleCurve[insertFrame - 1];
+                                        FPP.Frame = newFramePos;
+                                        RB.BC[indexBC].ScaleCurve.Insert(insertFrame, FPP);
+                                    }
+                                }
+
+                            }
+                            break;
+                    }
+                }
                 if (GUI.Button(new Rect(150, Screen.height / 2 + 140, 115, 20), "Remove"))
                 {
                     switch (elist[editmode])
@@ -133,7 +280,7 @@ public class AnimeEditor : MonoBehaviour
                             break;
                     }
                 }
-                
+
                 if (selectedFrame != prevSelectedFrame)
                     RB.AnimeFrameGo(frameNum);
                 prevSelectedFrame = selectedFrame;
@@ -157,8 +304,61 @@ public class AnimeEditor : MonoBehaviour
         catch { }
         selection = GUI.SelectionGrid(new Rect(30, Screen.height / 2 + 165, 235, 20), selection, slist, 2);
 
+        if (selection != prevselection)
+            UpdateCalcType();
+        prevselection = selection;
+
     }
 
+    void ApplyCalcType()
+    {
+        try
+        {
+            switch (elist[editmode])
+            {
+                case "Position":
+                    PosPoint ptemp = RB.BC[indexBC].PosCurve[selectedFrame];
+                    ptemp.calctype = int.Parse(calctype);
+                    ptemp.PowVal = int.Parse(powval);
+                    RB.BC[indexBC].PosCurve[selectedFrame] = ptemp;
+                    break;
+                case "Rotation":
+                    RotPoint rtemp = RB.BC[indexBC].RotCurve[selectedFrame];
+                    rtemp.calctype = int.Parse(calctype);
+                    rtemp.PowVal = int.Parse(powval);
+                    RB.BC[indexBC].RotCurve[selectedFrame] = rtemp;
+                    break;
+                case "Scale":
+                    ScalePoint stemp = RB.BC[indexBC].ScaleCurve[selectedFrame];
+                    stemp.calctype = int.Parse(calctype);
+                    stemp.PowVal = int.Parse(powval);
+                    RB.BC[indexBC].ScaleCurve[selectedFrame] = stemp;
+                    break;
+            }
+        }
+        catch { }
+    }
+
+    void UpdateCalcType()
+    {
+        try { 
+        switch (elist[editmode])
+        {
+            case "Position":
+                calctype = RB.BC[indexBC].PosCurve[selectedFrame].calctype.ToString();
+                powval = RB.BC[indexBC].PosCurve[selectedFrame].PowVal.ToString();
+                break;
+            case "Rotation":
+                calctype = RB.BC[indexBC].RotCurve[selectedFrame].calctype.ToString();
+                powval = RB.BC[indexBC].RotCurve[selectedFrame].PowVal.ToString();
+                break;
+            case "Scale":
+                calctype = RB.BC[indexBC].ScaleCurve[selectedFrame].calctype.ToString();
+                powval = RB.BC[indexBC].ScaleCurve[selectedFrame].PowVal.ToString();
+                break;
+        }
+    }catch {}
+    }
 
     public void UpdateTransformValues()
     {
@@ -266,7 +466,7 @@ public class AnimeEditor : MonoBehaviour
                 if (framelist.Count < selectedFrame)
                     selectedFrame = 0;
 
-                ScrollPositions[0] = GUI.BeginScrollView(new Rect(30, Screen.height / 2 - 75, 235, 210), ScrollPositions[0], new Rect(0, 0, 219, framelist.Count * 25));
+                ScrollPositions[0] = GUI.BeginScrollView(new Rect(30, Screen.height / 2 - 75, 235, 180), ScrollPositions[0], new Rect(0, 0, 219, framelist.Count * 25));
                 selectedFrame = GUI.SelectionGrid(new Rect(0, 0, 219, (float)25 * (float)framelist.Count), selectedFrame, framelist.ToArray(), 1);
                 frameNum = frameNumlist[selectedFrame];
                 GUI.EndScrollView();
@@ -283,6 +483,37 @@ public class AnimeEditor : MonoBehaviour
     {
         if (RB.BC[indexBC].PosCurve.Count == 0 && RB.BC[indexBC].RotCurve.Count == 0 && RB.BC[indexBC].ScaleCurve.Count == 0)
         { RB.BC.RemoveAt(indexBC); return true; }
+        return false;
+    }
+
+    private bool isFrameOccupied(int frame)
+    {
+        switch (elist[editmode])
+        {
+            case "Position":
+                for (int i = 0; i < RB.BC[indexBC].PosCurve.Count; i++)
+                {
+                    if (frame == RB.BC[indexBC].PosCurve[i].Frame)
+                        return true;
+                }
+                break;
+            case "Rotation":
+                for (int i = 0; i < RB.BC[indexBC].RotCurve.Count; i++)
+                {
+                    if (frame == RB.BC[indexBC].RotCurve[i].Frame)
+                        return true;
+                }
+                break;
+            case "Scale":
+                for (int i = 0; i < RB.BC[indexBC].PosCurve.Count; i++)
+                {
+                    if (frame == RB.BC[indexBC].RotCurve[i].Frame)
+                        return true;
+                }
+                break;
+        }
+
+
         return false;
     }
 }

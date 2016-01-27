@@ -15,6 +15,7 @@ public class RoboBuild : MonoBehaviour
     public string Modelpath = "";
     public bool parent = true;
     XmlWriter xw;
+    FileStream writer;
     public Assimp.AssimpImporter Importer = new Assimp.AssimpImporter();
     public List<BoneCurves> BC;
     string AnimeIDSave = "0";
@@ -95,6 +96,7 @@ public class RoboBuild : MonoBehaviour
                     }
 
                     part.AddComponent<MeshFilter>().mesh = mesh;
+                    //part.AddComponent<MeshCollider>().sharedMesh = mesh; 
                     part.AddComponent<MeshRenderer>().materials = materials;
                 }
             }
@@ -126,51 +128,57 @@ public class RoboBuild : MonoBehaviour
         CurrentID = -1;
         GameObject Base = parts[0];
         XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
-        xw = XmlWriter.Create(Path.Combine(BPpath, "BoneProperty.xml"), xws);
-        xw.WriteStartDocument();
-        xw.WriteStartElement("BoneProperty");
-        xw.WriteAttributeString("Count", parts.Count.ToString());
+        using (writer = new FileStream(Path.Combine(BPpath, "BoneProperty.xml"),FileMode.Create))
+        {
+            using (xw = XmlWriter.Create(writer, xws))
+            {
 
-        //write bone data
-        BoneData BD = Base.GetComponent<BoneData>();
-        xw.WriteStartElement(Base.name);
-        xw.WriteStartElement("Level");
-        xw.WriteAttributeString("Value", 0.ToString());
-        xw.WriteEndElement();
-        xw.WriteStartElement("ParentBoneIdx");
-        xw.WriteAttributeString("Value", (-1).ToString());
-        xw.WriteEndElement();
-        xw.WriteStartElement("TransMat");
-        BD.SMatrix = Matrix4x4.TRS(Base.transform.position, Base.transform.rotation, Base.transform.localScale);
-        xw.WriteString(MatrixToString(BD.SMatrix.transpose));
-        xw.WriteEndElement();
-        xw.WriteStartElement("OffsetMat");
-        xw.WriteString(MatrixToString(BD.SMatrix.transpose.inverse));
-        xw.WriteEndElement();
-        xw.WriteStartElement("EulerMode");
-        xw.WriteAttributeString("Value", BD.EulerMode.ToString());
-        xw.WriteEndElement();
-        xw.WriteStartElement("BoneLayers");
-        xw.WriteAttributeString("Value", BD.BoneLayers.ToString());
-        xw.WriteEndElement();
-        xw.WriteStartElement("BoneFlag");
-        xw.WriteAttributeString("Value", BD.BoneFlag[0].ToString());
-        xw.WriteAttributeString("Value2", BD.BoneFlag[1].ToString());
-        xw.WriteEndElement();
-        xw.WriteStartElement("LimitAng");
-        xw.WriteString(LimitAngToString(BD.LimitAng));
-        xw.WriteEndElement();
-        xw.WriteStartElement("Windom_FileName");
-        xw.WriteAttributeString("Text", BD.Windom_FileName);
-        xw.WriteEndElement();
-        xw.WriteStartElement("Windom_Hide");
-        xw.WriteAttributeString("Value", BD.Windom_Hide.ToString());
-        xw.WriteEndElement();
-        xw.WriteEndElement();
-        CurrentID++;
-        setChildren(Base.transform, 1, CurrentID);
-        xw.WriteEndDocument();
-        xw.Close();
+                xw.WriteStartDocument();
+                xw.WriteStartElement("BoneProperty");
+                xw.WriteAttributeString("Count", parts.Count.ToString());
+
+                //write bone data
+                BoneData BD = Base.GetComponent<BoneData>();
+                xw.WriteStartElement(Base.name);
+                xw.WriteStartElement("Level");
+                xw.WriteAttributeString("Value", 0.ToString());
+                xw.WriteEndElement();
+                xw.WriteStartElement("ParentBoneIdx");
+                xw.WriteAttributeString("Value", (-1).ToString());
+                xw.WriteEndElement();
+                xw.WriteStartElement("TransMat");
+                BD.SMatrix = Matrix4x4.TRS(Base.transform.position, Base.transform.rotation, Base.transform.localScale);
+                xw.WriteString(MatrixToString(BD.SMatrix.transpose));
+                xw.WriteEndElement();
+                xw.WriteStartElement("OffsetMat");
+                xw.WriteString(MatrixToString(BD.SMatrix.transpose.inverse));
+                xw.WriteEndElement();
+                xw.WriteStartElement("EulerMode");
+                xw.WriteAttributeString("Value", BD.EulerMode.ToString());
+                xw.WriteEndElement();
+                xw.WriteStartElement("BoneLayers");
+                xw.WriteAttributeString("Value", BD.BoneLayers.ToString());
+                xw.WriteEndElement();
+                xw.WriteStartElement("BoneFlag");
+                xw.WriteAttributeString("Value", BD.BoneFlag[0].ToString());
+                xw.WriteAttributeString("Value2", BD.BoneFlag[1].ToString());
+                xw.WriteEndElement();
+                xw.WriteStartElement("LimitAng");
+                xw.WriteString(LimitAngToString(BD.LimitAng));
+                xw.WriteEndElement();
+                xw.WriteStartElement("Windom_FileName");
+                xw.WriteAttributeString("Text", BD.Windom_FileName);
+                xw.WriteEndElement();
+                xw.WriteStartElement("Windom_Hide");
+                xw.WriteAttributeString("Value", BD.Windom_Hide.ToString());
+                xw.WriteEndElement();
+                xw.WriteEndElement();
+                CurrentID++;
+                setChildren(Base.transform, 1, CurrentID);
+                xw.WriteEndDocument();
+                xw.Close();
+            }
+        }
     }
 
     public void setChildren(Transform Tparent, int level, int parent)
@@ -275,7 +283,7 @@ public class RoboBuild : MonoBehaviour
 
     public void SaveRoboAnime()
     {
-        AnimeLoader.Save(BC, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"));
+        AnimeLoader.Save(BC, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"), parts);
     }
 
     public void AnimeFrameGo(int Frame)
