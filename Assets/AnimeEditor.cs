@@ -55,7 +55,7 @@ public class AnimeEditor : MonoBehaviour
                 GUI_BoneMenu();
 
                 GUI.Box(new Rect(Screen.width - 130, 50, 120, 40), "");
-                if (GUI.Button(new Rect(Screen.width - 115, 60, 90, 20), "Save")) { };
+                if (GUI.Button(new Rect(Screen.width - 115, 60, 90, 20), "Save")) { RB.SaveRoboAnime();}
             }
         }
 
@@ -153,7 +153,7 @@ public class AnimeEditor : MonoBehaviour
                                 PP.Frame = 0;
                                 PP.Value = Vector3.zero;
                                 PP.calctype = 0;
-                                PP.PowVal = 0;
+                                PP.PowVal = 1;
                                 RB.BC[indexBC].PosCurve.Add(PP);
                             }
                             else
@@ -192,7 +192,7 @@ public class AnimeEditor : MonoBehaviour
                                 RP.Frame = 0;
                                 RP.Value = Quaternion.identity;
                                 RP.calctype = 0;
-                                RP.PowVal = 0;
+                                RP.PowVal = 1;
                                 RB.BC[indexBC].RotCurve.Add(RP);
                             }
                             else
@@ -231,7 +231,7 @@ public class AnimeEditor : MonoBehaviour
                                 SP.Frame = 0;
                                 SP.Value = Vector3.zero;
                                 SP.calctype = 0;
-                                SP.PowVal = 0;
+                                SP.PowVal = 1;
                                 RB.BC[indexBC].ScaleCurve.Add(SP);
                             }
                             else

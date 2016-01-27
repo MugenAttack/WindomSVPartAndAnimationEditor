@@ -18,6 +18,7 @@ public class RoboBuild : MonoBehaviour
     FileStream writer;
     public Assimp.AssimpImporter Importer = new Assimp.AssimpImporter();
     public List<BoneCurves> BC;
+    public ScriptKeys sKeys;
     string AnimeIDSave = "0";
     //public List<GameObject> OrderedParts;
     int CurrentID = -1;
@@ -128,7 +129,7 @@ public class RoboBuild : MonoBehaviour
         CurrentID = -1;
         GameObject Base = parts[0];
         XmlWriterSettings xws = new XmlWriterSettings { Indent = true };
-        using (writer = new FileStream(Path.Combine(BPpath, "BoneProperty.xml"),FileMode.Create))
+        using (writer = new FileStream(Path.Combine(BPpath, "BoneProperty.xml"),FileMode.Create,FileAccess.ReadWrite,FileShare.ReadWrite))
         {
             using (xw = XmlWriter.Create(writer, xws))
             {
@@ -267,7 +268,9 @@ public class RoboBuild : MonoBehaviour
     public void LoadRoboAnime(string AnimeID)
     {
         AnimeIDSave = AnimeID;
-        BC = AnimeLoader.Load(Path.Combine(BPpath, "Anime_" + AnimeID + ".xml"));
+        BC = new List<BoneCurves>();
+        sKeys = new ScriptKeys();
+        AnimeLoader.Load(ref sKeys,ref BC,Path.Combine(BPpath, "Anime_" + AnimeID + ".xml"));
 
         foreach (BoneCurves curve in BC)
         {
@@ -283,7 +286,7 @@ public class RoboBuild : MonoBehaviour
 
     public void SaveRoboAnime()
     {
-        AnimeLoader.Save(BC, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"), parts);
+        AnimeLoader.Save(BC,sKeys, Path.Combine(BPpath, "Anime_" + AnimeIDSave + ".xml"), parts);
     }
 
     public void AnimeFrameGo(int Frame)
